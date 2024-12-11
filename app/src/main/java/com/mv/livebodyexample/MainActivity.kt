@@ -1,69 +1,94 @@
-@file:Suppress("DEPRECATION")
-
-package com.mv.livebodyexample
-
-import android.Manifest
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
-import android.annotation.TargetApi
-import android.content.pm.PackageManager
-import android.graphics.ImageFormat
-import android.graphics.Rect
-import android.hardware.Camera
-import android.os.Build
-import android.os.Bundle
-import android.util.DisplayMetrics
-import android.util.Log
-import android.view.Surface
-import android.view.SurfaceHolder
-import android.view.View
-import android.view.animation.LinearInterpolator
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
-import com.mv.livebodyexample.databinding.ActivityMainBinding
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
-import java.io.IOException
-
+/**
+ * MainActivity class that handles the main functionality of the application.
+ * This class is responsible for initializing the camera, handling permissions,
+ * and managing the detection engine.
+ */
 @ObsoleteCoroutinesApi
 class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDialogListener {
 
+    /**
+     * Binding object for the activity_main layout.
+     */
     private lateinit var binding: ActivityMainBinding
 
+    /**
+     * Flag to check if the engine is prepared.
+     */
     private var enginePrepared: Boolean = false
+
+    /**
+     * Wrapper for the detection engine.
+     */
     private lateinit var engineWrapper: EngineWrapper
+
+    /**
+     * Threshold value for detection.
+     */
     private var threshold: Float = defaultThreshold
 
+    /**
+     * Camera object for capturing preview frames.
+     */
     private var camera: Camera? = null
+
+    /**
+     * ID of the camera to be used (front-facing by default).
+     */
     private var cameraId: Int = Camera.CameraInfo.CAMERA_FACING_FRONT
+
+    /**
+     * Width of the camera preview.
+     */
     private val previewWidth: Int = 640
+
+    /**
+     * Height of the camera preview.
+     */
     private val previewHeight: Int = 480
 
     /**
-     *    1       2       3       4        5          6          7            8
-     * <p>
-     * 888888  888888      88  88      8888888888  88                  88  8888888888
-     * 88          88      88  88      88  88      88  88          88  88      88  88
-     * 8888      8888    8888  8888    88          8888888888  8888888888          88
-     * 88          88      88  88
-     * 88          88  888888  888888
+     * Orientation of the frame.
      */
     private val frameOrientation: Int = 7
 
+    /**
+     * Width of the screen.
+     */
     private var screenWidth: Int = 0
+
+    /**
+     * Height of the screen.
+     */
     private var screenHeight: Int = 0
 
+    /**
+     * Factor for scaling X coordinates.
+     */
     private var factorX: Float = 0F
+
+    /**
+     * Factor for scaling Y coordinates.
+     */
     private var factorY: Float = 0F
 
+    /**
+     * Coroutine context for detection.
+     */
     private val detectionContext = newSingleThreadContext("detection")
+
+    /**
+     * Flag to check if detection is in progress.
+     */
     private var working: Boolean = false
 
+    /**
+     * Animator for scaling the scan view.
+     */
     private lateinit var scaleAnimator: ObjectAnimator
 
+    /**
+     * Called when the activity is created. Initializes the activity and requests permissions if needed.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -72,9 +97,12 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         } else {
             requestPermission()
         }
-
     }
 
+    /**
+     * Checks if the required permissions are granted.
+     * @return True if all permissions are granted, false otherwise.
+     */
     private fun hasPermissions(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             for (permission in permissions) {
@@ -86,9 +114,15 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         return true
     }
 
+    /**
+     * Requests the necessary permissions.
+     */
     @TargetApi(Build.VERSION_CODES.M)
     private fun requestPermission() = requestPermissions(permissions, permissionReqCode)
 
+    /**
+     * Initializes the activity, sets up the camera and detection engine.
+     */
     private fun init() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.result = DetectionResult()
@@ -192,9 +226,11 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
             this.interpolator = LinearInterpolator()
             this.start()
         }
-
     }
 
+    /**
+     * Calculates the screen size and sets the screenWidth and screenHeight variables.
+     */
     private fun calculateSize() {
         val dm = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(dm)
@@ -202,6 +238,14 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         screenHeight = dm.heightPixels
     }
 
+    /**
+     * Calculates the location of the detection box on the screen.
+     * @param left Left coordinate of the detection box.
+     * @param top Top coordinate of the detection box.
+     * @param right Right coordinate of the detection box.
+     * @param bottom Bottom coordinate of the detection box.
+     * @return Rect object representing the location of the detection box on the screen.
+     */
     private fun calculateBoxLocationOnScreen(left: Int, top: Int, right: Int, bottom: Int): Rect =
         Rect(
             (left * factorX).toInt(),
@@ -210,6 +254,9 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
             (bottom * factorY).toInt()
         )
 
+    /**
+     * Sets the display orientation of the camera based on the device rotation.
+     */
     private fun setCameraDisplayOrientation() {
         val info = Camera.CameraInfo()
         Camera.getCameraInfo(cameraId, info)
@@ -231,13 +278,27 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         camera!!.setDisplayOrientation(result)
     }
 
+    /**
+     * Opens the threshold setting dialog.
+     * @param view The view that triggered this function.
+     */
     fun setting(@Suppress("UNUSED_PARAMETER") view: View) =
         SetThresholdDialogFragment().show(supportFragmentManager, "dialog")
 
+    /**
+     * Called when the positive button in the threshold dialog is clicked.
+     * @param t The new threshold value.
+     */
     override fun onDialogPositiveClick(t: Float) {
         threshold = t
     }
 
+    /**
+     * Called when the permissions request result is received.
+     * @param requestCode The request code.
+     * @param permissions The requested permissions.
+     * @param grantResults The grant results for the corresponding permissions.
+     */
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -252,6 +313,9 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         }
     }
 
+    /**
+     * Called when the activity is resumed. Initializes the detection engine.
+     */
     override fun onResume() {
         engineWrapper = EngineWrapper(assets)
         enginePrepared = engineWrapper.init()
@@ -263,6 +327,9 @@ class MainActivity : AppCompatActivity(), SetThresholdDialogFragment.ThresholdDi
         super.onResume()
     }
 
+    /**
+     * Called when the activity is destroyed. Cleans up resources.
+     */
     override fun onDestroy() {
         engineWrapper.destroy()
         scaleAnimator.cancel()

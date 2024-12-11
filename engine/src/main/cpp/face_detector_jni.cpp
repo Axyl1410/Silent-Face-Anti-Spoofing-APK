@@ -2,6 +2,8 @@
 // Created by yuanhao on 20-6-9.
 //
 
+
+
 #include "jni_long_field.h"
 #include "definition.h"
 #include "detection/face_detector.h"
@@ -46,6 +48,32 @@ FACE_DETECTOR_METHOD(nativeDetectYuv)(JNIEnv *env, jobject instance, jbyteArray 
 }
 
 
+/**
+ * @brief Converts a vector of FaceBox objects to a Java ArrayList of FaceBox objects.
+ *
+ * This function takes a vector of FaceBox objects and converts it into a Java ArrayList
+ * of FaceBox objects. Each FaceBox object in the vector is converted to a corresponding
+ * Java FaceBox object and added to the ArrayList.
+ *
+ * @param env A pointer to the JNI environment.
+ * @param boxes A reference to a vector of FaceBox objects to be converted.
+ * @return A jobject representing the Java ArrayList containing the converted FaceBox objects.
+ *
+ * Usage:
+ * ```
+ * std::vector<FaceBox> faceBoxes = ...; // Initialize with FaceBox objects
+ * JNIEnv* env = ...; // Obtain the JNI environment
+ * jobject faceBoxList = ConvertFaceBoxVector2List(env, faceBoxes);
+ * ```
+ *
+ * The function performs the following steps:
+ * 1. Finds the Java ArrayList class and its constructor and add methods.
+ * 2. Creates a new Java ArrayList object.
+ * 3. Finds the Java FaceBox class and its constructor method.
+ * 4. Iterates over the vector of FaceBox objects, converting each to a Java FaceBox object.
+ * 5. Adds each Java FaceBox object to the Java ArrayList.
+ * 6. Cleans up local references to avoid memory leaks.
+ */
 jobject ConvertFaceBoxVector2List(JNIEnv *env, std::vector<FaceBox>& boxes) {
     jclass list_clz = env->FindClass(JAVA_ARRAY_LIST_CLASSPATH);
 

@@ -40,6 +40,43 @@ LIVE_METHOD(nativeDetectYuv)(JNIEnv *env, jobject instance, jbyteArray yuv, jint
 }
 
 
+/**
+ * @brief Converts a list of Android model configurations to native model configurations.
+ *
+ * This function takes a Java list of model configuration objects and converts each
+ * configuration to a native ModelConfig structure, which is then stored in the provided
+ * vector of ModelConfig.
+ *
+ * @param env The JNI environment pointer.
+ * @param model_configs The Java list of model configuration objects.
+ * @param modelConfigs The vector to store the converted native ModelConfig structures.
+ *
+ * @details
+ * The function performs the following steps:
+ * 1. Clears the provided vector of ModelConfig.
+ * 2. Retrieves the size of the Java list.
+ * 3. Iterates over each element in the Java list.
+ * 4. For each element, retrieves the fields of the model configuration object.
+ * 5. Converts the fields to the corresponding native types and stores them in a ModelConfig structure.
+ * 6. Adds the ModelConfig structure to the provided vector.
+ *
+ * The expected fields in the Java model configuration object are:
+ * - name (String): The name of the model.
+ * - width (int): The width of the model.
+ * - height (int): The height of the model.
+ * - scale (float): The scale factor of the model.
+ * - shift_x (float): The horizontal shift of the model.
+ * - shift_y (float): The vertical shift of the model.
+ * - org_resize (boolean): A flag indicating whether the original resize is applied.
+ *
+ * Example usage:
+ * @code
+ * JNIEnv *env;
+ * jobject model_configs; // Assume this is initialized with a Java list of model configurations
+ * std::vector<ModelConfig> modelConfigs;
+ * ConvertAndroidConfig2NativeConfig(env, model_configs, modelConfigs);
+ * @endcode
+ */
 void ConvertAndroidConfig2NativeConfig(JNIEnv *env,jobject model_configs, std::vector<ModelConfig>& modelConfigs) {
     modelConfigs.clear();
 

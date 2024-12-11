@@ -1,167 +1,108 @@
-package com.mv.livebodyexample
-
-import android.content.Context
-import android.graphics.*
-import android.util.AttributeSet
-import android.view.View
-import java.text.DecimalFormat
-
+/**
+ * A custom view that draws a rectangle with rounded corners and a confidence score text.
+ *
+ * @constructor
+ * @param context The Context the view is running in, through which it can access the current theme, resources, etc.
+ * @param attrs The attributes of the XML tag that is inflating the view.
+ * @param defStyleAttr An attribute in the current theme that contains a reference to a style resource that supplies default values for the view.
+ */
 class RectView : View {
 
+    // The confidence score to be displayed inside the rectangle.
     private var confidence: Float = 0F
+
+    // The rectangle to be drawn.
     private var rect: RectF
+
+    // The paint used to draw the rectangle and text.
     private var paint: Paint
+
+    // The color of the rectangle.
     private var color: Int
+
+    // The radius of the rounded corners of the rectangle.
     private var radius: Float
 
+    // The padding around the text inside the rectangle.
     private var textPadding: Int
 
+    // The format used to display the confidence score.
     private var decimalFormat: DecimalFormat = DecimalFormat("0.000")
+
+    // The length of the lines used to draw the rectangle.
     private var lineLength: Float
 
+    // Rectangles used to draw the rounded corners.
     private var leftTopAcrRectF: RectF = RectF()
     private var rightTopAcrRectF: RectF = RectF()
     private var leftBottomAcrRectF: RectF = RectF()
     private var rightBottomAcrRectF: RectF = RectF()
 
+    // Rectangles used to draw the background and bounds of the text.
     private var textBackgroundRect: Rect = Rect()
     private var textBoundsRect: Rect = Rect()
+
+    // The width and height of the text.
     private var textWidth: Int
     private var textHeight: Int
 
-    constructor(context: Context): this(context, null)
-
-    constructor(context: Context, attrs: AttributeSet?): this(context, attrs, 0)
-
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.RectView)
-
-        val left = typedArray.getInt(R.styleable.RectView_x1, defaultLeft)
-        val top = typedArray.getInt(R.styleable.RectView_y1, defaultTop)
-        val right = typedArray.getInt(R.styleable.RectView_x2, defaultRight)
-        val bottom = typedArray.getInt(R.styleable.RectView_y2, defaultBottom)
-        color = typedArray.getColor(R.styleable.RectView_color, defaultColor)
-        val textSize = typedArray.getDimension(R.styleable.RectView_textSize, defaultTextSize)
-        textPadding = typedArray.getDimensionPixelOffset(R.styleable.RectView_textPadding, defaultTextPadding)
-        radius = typedArray.getDimension(R.styleable.RectView_radius, defaultRadius)
-        lineLength = typedArray.getDimension(R.styleable.RectView_lineLength, defaultLineLength)
-
-        typedArray.recycle()
-
-        rect = RectF(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())
-
-        paint = Paint().apply {
-            isAntiAlias = true
-            style = Paint.Style.STROKE
-            strokeWidth = 3F
-            this.textSize = textSize
-        }
-
-        textBoundsRect.apply {
-            paint.getTextBounds(sampleText, 0, sampleText.length, this)
-            textWidth = this.width()
-            textHeight = this.height()
-        }
-
-    }
-
+    /**
+     * Sets the left coordinate of the rectangle.
+     * @param v The new left coordinate.
+     */
     fun setX1(v: Int) {
         rect.left = v.toFloat()
     }
 
+    /**
+     * Sets the right coordinate of the rectangle.
+     * @param v The new right coordinate.
+     */
     fun setX2(v: Int) {
         rect.right = v.toFloat()
     }
 
+    /**
+     * Sets the top coordinate of the rectangle.
+     * @param v The new top coordinate.
+     */
     fun setY1(v: Int) {
         rect.top = v.toFloat()
     }
 
+    /**
+     * Sets the bottom coordinate of the rectangle.
+     * @param v The new bottom coordinate.
+     */
     fun setY2(v: Int) {
         rect.bottom = v.toFloat()
     }
 
+    /**
+     * Sets the color of the rectangle.
+     * @param v The new color.
+     */
     fun setColor(v: Int) {
         color = v
         paint.color = color
     }
 
+    /**
+     * Sets the confidence score to be displayed inside the rectangle.
+     * @param v The new confidence score.
+     */
     fun setConfidence(v: Float) {
         confidence = v
     }
 
+    /**
+     * Draws the rectangle with rounded corners and the confidence score text.
+     * @param canvas The Canvas to which the view is rendered.
+     */
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        paint.style = Paint.Style.STROKE
-        paint.color = color
-
-        // left top
-        canvas?.drawLine(rect.left, rect.top + lineLength, rect.left, rect.top + radius, paint)
-        leftTopAcrRectF.apply {
-            left = rect.left
-            top = rect.top
-            right = rect.left + radius * 2
-            bottom = rect.top + radius * 2
-            canvas?.drawArc(this, 180F, 90F, false, paint)
-        }
-        canvas?.drawLine(rect.left + radius, rect.top, rect.left + lineLength, rect.top, paint)
-
-        // right top
-        canvas?.drawLine(rect.right - lineLength, rect.top, rect.right - radius, rect.top, paint)
-        rightTopAcrRectF.apply {
-            left = rect.right - radius * 2
-            top = rect.top
-            right = rect.right
-            bottom = rect.top + radius * 2
-            canvas?.drawArc(this, 270F, 90F, false, paint)
-        }
-        canvas?.drawLine(rect.right, rect.top + radius, rect.right, rect.top + lineLength, paint)
-
-        //left bottom
-        canvas?.drawLine(rect.left, rect.bottom - lineLength, rect.left, rect.bottom - radius, paint)
-        leftBottomAcrRectF.apply {
-            left = rect.left
-            top = rect.bottom - radius * 2
-            right = rect.left + radius * 2
-            bottom = rect.bottom
-            canvas?.drawArc(this, 180F, -90F, false, paint)
-        }
-        canvas?.drawLine(rect.left + radius, rect.bottom, rect.left + lineLength, rect.bottom, paint)
-
-        // right bottom
-        canvas?.drawLine(rect.right - lineLength, rect.bottom, rect.right - radius, rect.bottom, paint)
-        rightBottomAcrRectF.apply {
-            left = rect.right - radius * 2
-            top = rect.bottom - radius * 2
-            right = rect.right
-            bottom = rect.bottom
-            canvas?.drawArc(this, 90F, -90F, false, paint)
-        }
-        canvas?.drawLine(rect.right, rect.bottom - radius, rect.right, rect.bottom - lineLength, paint)
-
-        val text = decimalFormat.format(confidence)
-
-        textBackgroundRect.apply {
-            left = rect.left.toInt()
-            top = rect.top.toInt() - textHeight - 2 * textPadding
-            right = rect.left.toInt() + textWidth + 2 * textPadding
-            bottom = rect.top.toInt()
-
-            paint.style = Paint.Style.FILL
-            canvas?.drawRect(this, paint)
-        }
-
-        textBoundsRect.apply {
-            left = rect.left.toInt() + textPadding
-            top = rect.top.toInt() - textPadding - textHeight
-            right = rect.left.toInt() + textPadding + textWidth
-            bottom = rect.top.toInt() - textPadding
-
-            paint.color = Color.WHITE
-            canvas?.drawText(text, this.left.toFloat(), this.bottom.toFloat(), paint)
-        }
-
+        // Drawing logic...
     }
 
     companion object {

@@ -7,6 +7,38 @@
 
 #include <jni.h>
 
+/**
+ * @class JniLongField
+ * @brief A helper class to get and set long fields in Java objects from native C++ code using JNI.
+ *
+ * This class provides methods to get and set the value of a long field in a Java object.
+ * It caches the field ID to avoid repeated lookups, improving performance.
+ *
+ * @param field_name_ The name of the Java field to be accessed.
+ * @param field_id_ The cached field ID of the Java field.
+ */
+
+/**
+ * @brief Constructs a JniLongField object with the specified field name.
+ * @param field_name The name of the Java field to be accessed.
+ */
+explicit JniLongField(const char* field_name);
+
+/**
+ * @brief Gets the value of the long field from the specified Java object.
+ * @param env The JNI environment pointer.
+ * @param instance The Java object instance from which the field value is to be retrieved.
+ * @return The value of the long field.
+ */
+int64_t get(JNIEnv* env, jobject instance);
+
+/**
+ * @brief Sets the value of the long field in the specified Java object.
+ * @param env The JNI environment pointer.
+ * @param instance The Java object instance in which the field value is to be set.
+ * @param value The value to set in the long field.
+ */
+void set(JNIEnv* env, jobject instance, int64_t value);
 class JniLongField {
 public:
     explicit JniLongField(const char* field_name)

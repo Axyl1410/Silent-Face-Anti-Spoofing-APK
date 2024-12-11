@@ -76,6 +76,31 @@ float Live::Detect(cv::Mat &src, FaceBox &box) {
     return confidence;
 }
 
+/**
+ * @brief Calculate a bounding box for a face with given configurations.
+ *
+ * This function calculates a new bounding box for a face based on the input face box,
+ * image dimensions, and model configuration. The new bounding box is scaled and shifted
+ * according to the provided configuration and is adjusted to ensure it stays within the
+ * image boundaries.
+ *
+ * @param box The input face box containing the coordinates of the face.
+ * @param w The width of the image.
+ * @param h The height of the image.
+ * @param config The model configuration containing scaling and shifting parameters.
+ * @return A cv::Rect representing the calculated bounding box.
+ *
+ * @note The function ensures that the calculated bounding box does not exceed the image boundaries.
+ *
+ * Example usage:
+ * @code
+ * FaceBox faceBox = {x1, y1, x2, y2};
+ * ModelConfig config = {scale, shift_x, shift_y};
+ * int imageWidth = 640;
+ * int imageHeight = 480;
+ * cv::Rect boundingBox = live.CalculateBox(faceBox, imageWidth, imageHeight, config);
+ * @endcode
+ */
 cv::Rect Live::CalculateBox(FaceBox &box, int w, int h, ModelConfig &config) {
     int x = static_cast<int>(box.x1);
     int y = static_cast<int>(box.y1);

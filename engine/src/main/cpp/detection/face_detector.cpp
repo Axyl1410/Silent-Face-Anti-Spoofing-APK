@@ -42,6 +42,37 @@ int FaceDetector::LoadModel(AAssetManager* assetManager) {
 }
 
 
+/**
+ * @brief Detect faces in the given image.
+ * 
+ * This function detects faces in the provided image and returns the bounding boxes of detected faces.
+ * 
+ * @param src The input image in cv::Mat format.
+ * @param boxes A vector to store the detected face bounding boxes.
+ * @return int Returns 0 on successful detection.
+ * 
+ * @details
+ * - The function resizes the input image to the required input size for the neural network.
+ * - It normalizes the image and feeds it into the neural network.
+ * - The output of the network is processed to extract face bounding boxes.
+ * - Bounding boxes are filtered based on confidence and size.
+ * - The bounding boxes are adjusted to be square.
+ * - The bounding boxes are sorted based on their area.
+ * 
+ * @note
+ * - The input image should be in BGR format.
+ * - The function uses the ncnn library for neural network inference.
+ * - The function assumes that the neural network model is already loaded into the `net_` member variable.
+ * 
+ * @example
+ * cv::Mat image = cv::imread("path_to_image.jpg");
+ * std::vector<FaceBox> face_boxes;
+ * FaceDetector detector;
+ * detector.Detect(image, face_boxes);
+ * for (const auto& box : face_boxes) {
+ *     cv::rectangle(image, cv::Point(box.x1, box.y1), cv::Point(box.x2, box.y2), cv::Scalar(0, 255, 0), 2);
+ * }
+ */
 int FaceDetector::Detect(cv::Mat &src, std::vector<FaceBox> &boxes) {
     int w = src.cols;
     int h = src.rows;

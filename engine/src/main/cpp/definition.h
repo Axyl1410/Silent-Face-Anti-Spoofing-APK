@@ -25,6 +25,34 @@ struct FaceBox {
     float y2;
 };
 
+/**
+ * @struct ModelConfig
+ * @brief Configuration structure for a model.
+ *
+ * This structure holds the configuration parameters for a model, including
+ * scaling factors, shifts, dimensions, and other properties.
+ *
+ * @var ModelConfig::scale
+ * Scaling factor for the model.
+ *
+ * @var ModelConfig::shift_x
+ * Horizontal shift for the model.
+ *
+ * @var ModelConfig::shift_y
+ * Vertical shift for the model.
+ *
+ * @var ModelConfig::height
+ * Height of the model.
+ *
+ * @var ModelConfig::width
+ * Width of the model.
+ *
+ * @var ModelConfig::name
+ * Name of the model.
+ *
+ * @var ModelConfig::org_resize
+ * Flag indicating whether to use original resizing.
+ */
 struct ModelConfig {
     float scale;
     float shift_x;

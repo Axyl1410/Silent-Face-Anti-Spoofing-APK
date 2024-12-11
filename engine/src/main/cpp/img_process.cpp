@@ -41,6 +41,34 @@ int ConvertBitmap2Mat(JNIEnv* env, jobject bitmap, cv::Mat& out) {
  *  88          88      88  88
  *  88          88  888888  888888
  */
+/**
+ * @brief Converts YUV420sp (NV21) image data to BGR format and applies orientation transformations.
+ * 
+ * @param data Pointer to the input YUV420sp (NV21) image data.
+ * @param width Width of the input image.
+ * @param height Height of the input image.
+ * @param orientation Orientation code indicating the type of transformation to apply:
+ *        1 - No transformation
+ *        2 - Horizontal flip
+ *        3 - Horizontal and vertical flip
+ *        4 - Vertical flip
+ *        5 - Transpose
+ *        6 - Rotate 90 degrees clockwise
+ *        7 - Horizontal and vertical flip, then transpose
+ *        8 - Rotate 90 degrees counterclockwise
+ * @param dst Reference to the output cv::Mat object where the BGR image will be stored.
+ * 
+ * @note The function first converts the YUV420sp (NV21) image data to BGR format using OpenCV's cvtColor function.
+ *       Then, it applies the specified orientation transformation to the BGR image.
+ * 
+ * @example
+ * unsigned char* yuvData = ...; // Pointer to YUV420sp (NV21) data
+ * int width = ...; // Width of the image
+ * int height = ...; // Height of the image
+ * int orientation = 6; // Rotate 90 degrees clockwise
+ * cv::Mat bgrImage;
+ * Yuv420sp2bgr(yuvData, width, height, orientation, bgrImage);
+ */
 void Yuv420sp2bgr(unsigned char* data, int width, int height, int orientation, cv::Mat& dst) {
     cv::Mat yuv(height + height / 2, width, CV_8UC1, data);
     dst.create(height, width, CV_8UC3);
