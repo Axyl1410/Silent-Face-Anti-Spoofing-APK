@@ -57,9 +57,4 @@ class SetThresholdDialogFragment : DialogFragment() {
             }
     }
 }
-            set(value) {
-                field = value
-                notifyPropertyChanged(BR.t)
-            }
-    }
-}
+           
